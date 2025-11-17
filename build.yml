@@ -1,0 +1,75 @@
+name: Build Snake Game
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows EXE
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Windows EXE
+      run: |
+        pyinstaller --noconfirm --clean --onefile --windowed \
+        --add-data "assets;assets" \
+        --add-data "skins;skins" \
+        --add-data "musica;musica" \
+        --add-data "economia.py;." \
+        --add-data "tienda.py;." \
+        main.py
+
+    - name: Upload Windows Build
+      uses: actions/upload-artifact@v3
+      with:
+        name: snake-windows
+        path: dist/main.exe
+
+  build-linux:
+    name: Build Linux Executable
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Linux Executable
+      run: |
+        pyinstaller --noconfirm --clean --onefile --windowed \
+        --add-data "assets:assets" \
+        --add-data "skins:skins" \
+        --add-data "musica:musica" \
+        --add-data "economia.py:." \
+        --add-data "tienda.py:." \
+        main.py
+
+    - name: Upload Linux Build
+      uses: actions/upload-artifact@v3
+      with:
+        name: snake-linux
+        path: dist/main
