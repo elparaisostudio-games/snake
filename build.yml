@@ -73,3 +73,19 @@ jobs:
       with:
         name: snake-linux
         path: dist/main
+
+        - name: Create GitHub Release
+  uses: softprops/action-gh-release@v1
+  with:
+    tag_name: v${{ github.run_number }}
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+- name: Upload release asset (Windows)
+  uses: actions/upload-release-asset@v1
+  with:
+    upload_url: ${{ steps.create_release.outputs.upload_url }}
+    asset_path: dist/main.exe
+    asset_name: snake-windows-${{ github.run_number }}.exe
+    asset_content_type: application/octet-stream
+
