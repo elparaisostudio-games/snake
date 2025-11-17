@@ -86,23 +86,28 @@ def equip_skin(data, skin_name):
 def redeem_dlc_file(filepath, data):
     try:
         with open(filepath, "r") as f:
-            content = f.read().strip()
-
-        if content == "COINS100":
-            data["coins"] += 100
-        elif content == "COINS300":
-            data["coins"] += 300
-        elif content == "COINS1000":
-            data["coins"] += 1000
-        else:
-            return "Archivo DLC inválido."
-
-        save_data(data)
-        return "DLC canjeado con éxito."
-
+            token = f.read().strip()
     except:
         return "Error leyendo archivo."
 
+    # tokens únicos: tienen formato PREFIX-XXXX...
+    if token.startswith("COINS100"):
+        amount = 100
+    elif token.startswith("COINS300"):
+        amount = 300
+    elif token.startswith("COINS1000"):
+        amount = 1000
+    else:
+        return "Token inválido."
+
+    used = data.setdefault("used_tokens", [])
+    if token in used:
+        return "Este token ya fue canjeado."
+
+    data["coins"] = data.get("coins", 0) + amount
+    used.append(token)
+    save_data(data)
+    return f"Canjeado +{amount} monedas"
 
 # ========================
 #       SISTEMA MONEDAS
